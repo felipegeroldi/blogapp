@@ -1,0 +1,32 @@
+﻿@using System.Security.Claims
+@{
+    var roleClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
+}
+
+<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+    <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+        </li>
+        @if(User.Identity!.IsAuthenticated)
+        {
+            @if(roleClaim!.Value == "Editor" || roleClaim!.Value == "Administrator")
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="Create">Create Post</a>
+                </li>
+            }
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
+            </li>
+        } else
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Index">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Register">Register</a>
+            </li>
+        }
+    </ul>
+</div>

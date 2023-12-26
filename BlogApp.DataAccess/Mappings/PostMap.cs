@@ -15,6 +15,10 @@ internal class PostMap : IEntityTypeConfiguration<Post>
             .UseIdentityColumn()
             .ValueGeneratedOnAdd();
 
+        builder.Property(x => x.Title)
+            .HasColumnType("NVARCHAR(120)")
+            .IsRequired();
+
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 

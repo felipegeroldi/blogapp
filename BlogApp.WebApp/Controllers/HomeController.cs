@@ -22,5 +22,11 @@ namespace BlogApp.WebApp.Controllers
         {
             return Content("Forbidden");
         }
+
+        [HttpGet("/NotFound")]
+        public IActionResult ErrorNotFound()
+        {
+            return Content("Not Found");
+        }
     }
 }

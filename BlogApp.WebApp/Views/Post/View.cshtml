@@ -1,0 +1,19 @@
+﻿@using BlogApp.Models
+@model Post
+@{
+    ViewBag.Title = Model.Title;
+}
+<div class="container">
+    <div class="row">
+        <h2 class="card-title">@Model.Title</h2>
+    </div>
+    <div class="row mt-3">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">@Html.Raw(Model.Content)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
