@@ -1,19 +1,82 @@
 ﻿@using BlogApp.Models
-@model Post
+@model CreatePostCommentaryViewModel
 @{
-    ViewBag.Title = Model.Title;
+    Post post = (Post)ViewBag.Post;
+    ViewBag.Title = post.Title;
 }
 <div class="container">
     <div class="row">
-        <h2 class="card-title">@Model.Title</h2>
+        <h2 class="card-title">@post.Title</h2>
     </div>
     <div class="row mt-3">
         <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="card">
                 <div class="card-body">
-                    <p class="card-text">@Html.Raw(Model.Content)</p>
+                    <p class="card-text">@Html.Raw(post.Content)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/><hr/>
+    <h3>Commentaries</h3>
+
+    <div class="row mt-4">
+        <div class="col-sm-12 col-md-12 col-xl-12 m-auto">
+            <div class="card">
+                <div class="card-header">
+                    New commentary
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Commentary" asp-action="Create" method="post">
+                        <input type="hidden" asp-for="PostId" value="@post.Id" />
+                        <div class="form-group">
+                            <textarea id="summernote" asp-for="Content"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    @if (post.Commentaries is not null && post.Commentaries.Count() > 0)
+                    {
+                        @foreach (var commentary in post.Commentaries)
+                        {
+                            <h4 class="card-text">@commentary.Author.Name has commented:</h4>
+                            <p class="card-text">@Html.Raw(commentary.Content)</p>
+                            @if (post.Commentaries.Count() > 1)
+                            {
+                                <hr />
+                            }
+                        }
+                    } else
+                    {
+                        <p class="card-text">Nobody has commented yet. Be the first!</p>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Styles
+{
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+}
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $('#summernote').summernote({
+            tabsize: 2,
+            height: 200
+        });
+    </script>
+}

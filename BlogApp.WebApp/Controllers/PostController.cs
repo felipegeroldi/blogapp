@@ -3,14 +3,15 @@ using BlogApp.Models;
 using BlogApp.WebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BlogApp.WebApp.Controllers;
 
 [Route("Post")]
-[Authorize(Roles = "Editor,Administrator")]
 public class PostController : Controller
 {
+    private const int POSTS_PER_PAGE = 5;
     private readonly IPostRepository _postRepository;
 
     public PostController(IPostRepository postRepository)
@@ -18,9 +19,11 @@ public class PostController : Controller
         _postRepository = postRepository;
     }
 
+    [Authorize(Roles = "Editor,Administrator")]
     [HttpGet("Create")]
     public IActionResult Create() => View();
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> ViewAsync(int id)
     {
@@ -28,9 +31,36 @@ public class PostController : Controller
         if (post is null)
             return RedirectToAction("ErrorNotFound", "Home");
 
-        return View(post);
+        ViewBag.Post = post;
+        return View();
     }
 
+    [AllowAnonymous]
+    [HttpGet("/Posts")]
+    public async Task<IActionResult> PaginateAsync([FromQuery] int page)
+    {
+        PagePostsViewModel pagination = new()
+        {
+            Page = page,
+            PostsPerPage = POSTS_PER_PAGE,
+        };
+
+        pagination.Posts = await _postRepository.Posts
+            .OrderByDescending(x => x.Id)
+            .Skip(pagination.PostsPerPage * pagination.Page)
+            .Take(pagination.PostsPerPage)
+            .ToListAsync();
+
+        if (pagination.Posts.Count() == 0)
+            return RedirectToAction("NotFoundError", "Home");
+
+        pagination.FinalPage = await _postRepository.Posts
+            .CountAsync() > pagination.PostsPerPage * (pagination.Page + 1);
+
+        return View(pagination);
+    }
+
+    [Authorize(Roles = "Editor,Administrator")]
     [HttpPost("Create")]
     public async Task<IActionResult> RegisterNewPostAsync(
         [FromServices] IUserRepository userRepository,
@@ -51,7 +81,7 @@ public class PostController : Controller
             };
 
             await _postRepository.AddPostAsync(post);
-            return RedirectToAction("ViewAsync", new { post.Id });
+            return RedirectToAction("View", new { post.Id });
         }
 
         return View("Create", model);

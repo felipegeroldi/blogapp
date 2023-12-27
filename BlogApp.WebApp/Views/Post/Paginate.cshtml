@@ -1,12 +1,12 @@
-﻿@using BlogApp.Models
-@model IEnumerable<Post>;
+﻿@model PagePostsViewModel;
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Posts";
 }
 
+
 <div class="container">
-    @foreach(var post in Model)
+    @foreach (var post in Model.Posts)
     {
         <div class="row mt-3">
             <div class="col-sm-12 col-md-12 col-xl-12">
@@ -15,8 +15,8 @@
                         <div class="card-body">
                             <h1>@post.Title</h1>
                             <p class="card-text">
-                                @Html.Raw(post.Content.Substring(0, int.Min(300, post.Content.Length))) 
-                                <br /> 
+                                @Html.Raw(post.Content.Substring(0, int.Min(300, post.Content.Length)))
+                                <br />
                                 <span class="text-muted">See more...</span>
                             </p>
                         </div>
@@ -26,12 +26,16 @@
         </div>
     }
 
-    @if (ViewBag.HasMorePosts)
-    {
-        <div class="row mt-3 text-end">
-            <a asp-action="Paginate" asp-controller="Post" asp-route-page="1">See more posts</a>
-        </div>
-    }
+    <div class="row mt-3">
+        @if(Model.Page > 1)
+        {
+            <a class="text-start" asp-action="Paginate" asp-controller="Post" asp-route-page="@(Model.Page-1)">&lt;&lt;Previous Page</a>
+        }
+        @if(Model.FinalPage)
+        {
+            <a class="text-end" asp-action="Paginate" asp-controller="Post" asp-route-page="@(Model.Page+1)">Next Page &gt;&gt;</a>
+        }
+    </div>
 </div>
 
 @section Styles {

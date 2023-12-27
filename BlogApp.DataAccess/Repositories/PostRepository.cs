@@ -14,6 +14,8 @@ public class PostRepository : IPostRepository
         _context = context;
     }
 
+    public DbSet<Post> Posts => _context.Posts;
+
     public async Task AddPostAsync(Post post)
     {
         await _context.Posts.AddAsync(post);
@@ -21,5 +23,8 @@ public class PostRepository : IPostRepository
     }
 
     public Task<Post?> GetPostByIdAsync(int id)
-        => _context.Posts.FirstOrDefaultAsync(x => x.Id == id);
+        => _context.Posts
+        .Include(x => x.Commentaries)
+        .ThenInclude(x => x.Author)
+        .FirstOrDefaultAsync(x => x.Id == id);
 }
